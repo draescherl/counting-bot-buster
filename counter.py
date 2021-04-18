@@ -69,10 +69,11 @@ class Bot():
                 i += 2
                 if (not self.is_my_turn(index, i - 1)):
                     broken = True
-                    actions = ActionChains(self.driver)
-                    actions.send_keys("T'es relou Dimitri...")
-                    actions.send_keys(Keys.ENTER)
-                    actions.perform()
+                    if (self.offset):
+                        actions = ActionChains(self.driver)
+                        actions.send_keys("T'es relou Dimitri...")
+                        actions.send_keys(Keys.ENTER)
+                        actions.perform()
                     sleep(5)
 
 
