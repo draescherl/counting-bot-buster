@@ -39,14 +39,15 @@ class Bot():
         xpath = "/html/body/div/div[2]/div/div[2]/div/div/div/div[2]/div[2]/div[2]/main/div[1]/div/div/div/div[" + str(index + i) + "]/div[1]/div"
         # print('searching for element ' + str(index + i))
         while (not element_exists(xpath)):
+            sleep(0.1)
             continue
         # print(self.driver.find_element_by_xpath(xpath).text)
         # print(i)
         return self.driver.find_element_by_xpath(xpath).text == str(i)
 
     def count(self):
-        inputArea = self.driver.find_element_by_xpath('/html/body/div/div[2]/div/div[2]/div/div/div/div[2]/div[2]/div[2]/main/form/div/div/div/div/div/div[3]/div[2]/div')
-        inputArea.click()
+        # inputArea = self.driver.find_element_by_xpath('/html/body/div/div[2]/div/div[2]/div/div/div/div[2]/div[2]/div[2]/main/form/div/div/div/div/div/div[3]/div[2]/div')
+        # inputArea.click()
         broken = False
         i = 1 + self.offset
         index = self.get_starting_index()
@@ -54,7 +55,7 @@ class Bot():
         # print("i : " + str(i))
         # print("start index : " + str(index))
         while True:
-            sleep(1)
+            sleep(0.1)
             if (i == 2):
                 self.is_my_turn(index, i - 1)
 
