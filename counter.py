@@ -9,7 +9,8 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from time import sleep
 
-def isElementHere(xpath):
+
+def element_exists(xpath):
     try:
         bot.driver.find_element_by_xpath(xpath)
     except NoSuchElementException:
@@ -21,70 +22,67 @@ class Bot():
     def __init__(self, offset):
         self.driver = webdriver.Firefox()
         self.offset = offset
-    
+
     def connect(self):
         self.driver.get('https://discord.com/channels/819626874035503204/819974354955141141')
         sleep(3)
 
-# /html/body/div/div[2]/div/div[2]/div/div/div/div[2]/div[2]/div[2]/main/div[1]/div/div/div/div[52]/div[1]/div
-# /html/body/div/div[2]/div/div[2]/div/div/div/div[2]/div[2]/div[2]/main/div[1]/div/div/div/div[53]/div[1]/div
-
-    def get_index(self):
+    def get_starting_index(self):
         index = 47
         xpath = "/html/body/div/div[2]/div/div[2]/div/div/div/div[2]/div[2]/div[2]/main/div[1]/div/div/div/div[" + str(index) + "]/div[1]/div"
-        while (isElementHere(xpath)):
+        while (element_exists(xpath)):
             index += 1
             xpath = "/html/body/div/div[2]/div/div[2]/div/div/div/div[2]/div[2]/div[2]/main/div[1]/div/div/div/div[" + str(index) + "]/div[1]/div"
         return index - 1
 
     def is_my_turn(self, index, i):
         xpath = "/html/body/div/div[2]/div/div[2]/div/div/div/div[2]/div[2]/div[2]/main/div[1]/div/div/div/div[" + str(index + i) + "]/div[1]/div"
-        print('searching for element ' + str(index + i))
-        while (not isElementHere(xpath)):
-            print('here')
+        # print('searching for element ' + str(index + i))
+        while (not element_exists(xpath)):
             continue
-
-        return self.driver.find_element_by_xpath(xpath).text == str(i - 1)
-
+        # print(self.driver.find_element_by_xpath(xpath).text)
+        # print(i)
+        return self.driver.find_element_by_xpath(xpath).text == str(i)
 
     def count(self):
         inputArea = self.driver.find_element_by_xpath('/html/body/div/div[2]/div/div[2]/div/div/div/div[2]/div[2]/div[2]/main/form/div/div/div/div/div/div[3]/div[2]/div')
         inputArea.click()
         broken = False
-        while not broken:
-            broken = False
-            i = 1 + self.offset
-            index = self.get_index()
-            print("index :" + str(index))
-            print("i :" + str(i))
-            while not broken:
+        i = 1 + self.offset
+        index = self.get_starting_index()
+
+        # print("i : " + str(i))
+        # print("start index : " + str(index))
+        while True:
+            sleep(1)
+            if (i == 2):
+                self.is_my_turn(index, i - 1)
+
+            if broken:
+                # print("Count broken, restarting.")
+                i = 1 + self.offset
+                index = self.get_starting_index()
+                broken = False
+            else:
                 actions = ActionChains(self.driver)
                 actions.send_keys(i)
                 actions.send_keys(Keys.ENTER)
                 actions.perform()
+                # print("Wrote message")
                 i += 2
-                if (self.is_my_turn(index, i)):
-                    continue
-                else:
+                # print("New i : " + str(i))
+                if (not self.is_my_turn(index, i - 1)):
                     broken = True
-                    # actions = ActionChains(self.driver)
-                    # actions.send_keys("T'es relou Dimitri...")
-                    # actions.send_keys(Keys.ENTER)
-                    # actions.perform()
-                sleep(1)
-
-
-
-# ca casse => 53
-# 1 => 54
-# wait for 55
-# check if 55 == i-1
-
+                    actions = ActionChains(self.driver)
+                    actions.send_keys("T'es relou Dimitri...")
+                    actions.send_keys(Keys.ENTER)
+                    actions.perform()
+                    sleep(3)
 
 
 # offset = 0 -> odd numbers
 # offset = 1 -> even numbers
-bot = Bot(0)
+bot = Bot(1)
 bot.connect()
 input('Hit enter when you are logged in and on the right channel')
 bot.count()
